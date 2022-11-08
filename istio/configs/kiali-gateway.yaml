@@ -115,6 +115,24 @@ spec:
 ...
 ---
 apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: tekton-virtualservice
+  namespace: istio-system
+spec:
+  gateways:
+  - kiali-gateway
+  hosts: ["tekton.synectiks.net"]
+  http:
+  - route:
+    - destination:
+        host: tekton-dashboard.tekton-pipelines.svc.cluster.local
+        port:
+          number: 9097
+      weight: 100
+...
+---
+apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: kiali-destinationrule
@@ -169,6 +187,18 @@ metadata:
   namespace: istio-system
 spec:
   host: tracing
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+...
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: tekton-destinationrule
+  namespace: istio-system
+spec:
+  host: tekton
   trafficPolicy:
     tls:
       mode: DISABLE
